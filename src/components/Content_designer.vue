@@ -18,6 +18,9 @@ import WorkArea from "./Work_area";
     props: {
       containerArray: Array,
       changeContainer: Function
+    },
+    updated() {
+      console.log("ren")
     }
   }
 </script>

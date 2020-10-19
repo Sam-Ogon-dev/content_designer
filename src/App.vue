@@ -2,7 +2,7 @@
   <div id="app">
     <div class="d-flex flex-row w-100 bg-danger align-content-center p-1">
       <img class="back icon m-1" src="@/assets/arrow.png" @click="back">
-      <img class="next icon reverse_image m-1" src="@/assets/arrow.png">
+      <img class="next icon reverse_image m-1" src="@/assets/arrow.png" @click="next">
       <img class="plus icon m-1" src="@/assets/plus.png" @click="createContainer">
       <img class="delete icon m-1" src="@/assets/basket.png">
     </div>
@@ -20,8 +20,7 @@ export default {
   store: store,
   computed: {
     containerArray: function () {
-      console.log(11)
-      return this.$store.state.containerArray;
+      return this.$store.state.history.containerArray;
     }
   },
   components: {
@@ -29,7 +28,7 @@ export default {
   },
   methods: {
     createContainer() {
-      this.$store.commit("ADD_TO_LAST_HISTORY", {
+      this.$store.commit("CHANGE_HISTORY", {
         type: "create",
         payload: {
           x: 110,
@@ -46,7 +45,10 @@ export default {
       this.containerArray = newArray
     },
     back() {
-      this.$store.commit("ADD_TO_FUTURE_HISTORY");
+      this.$store.commit("BACK_HISTORY");
+    },
+    next() {
+      this.$store.commit("NEXT_HISTORY");
     }
   }
 }
