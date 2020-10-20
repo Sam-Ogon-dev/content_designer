@@ -4,9 +4,9 @@
       <img class="back icon m-1" src="@/assets/arrow.png" @click="back">
       <img class="next icon reverse_image m-1" src="@/assets/arrow.png" @click="next">
       <img class="plus icon m-1" src="@/assets/plus.png" @click="createContainer">
-      <img class="delete icon m-1" src="@/assets/basket.png">
+      <img class="delete icon m-1" src="@/assets/basket.png" @click="deleteContainer">
     </div>
-    <ContentDesigner :containerArray="containerArray" :changeContainer="changeContainer"/>
+    <ContentDesigner :containerArray="containerArray"/>
   </div>
 </template>
 
@@ -29,26 +29,24 @@ export default {
   methods: {
     createContainer() {
       this.$store.commit("CHANGE_HISTORY", {
-        type: "create",
+        type: "created",
         payload: {
           x: 110,
           y: 110,
-          name: "контейнер " + this.$store.state.history.containerArray.length,
+          date: Date.now(),
           width: 200,
           height: 200
         }
       });
-    },
-    changeContainer(index, value) {
-      const newArray = [...this.containerArray]
-      newArray[index] = value;
-      this.containerArray = newArray
     },
     back() {
       this.$store.commit("BACK_HISTORY");
     },
     next() {
       this.$store.commit("NEXT_HISTORY");
+    },
+    deleteContainer() {
+
     }
   }
 }

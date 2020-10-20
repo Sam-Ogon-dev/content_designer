@@ -1,9 +1,13 @@
 <template>
- <div class="d-flex flex-column align-content-center w-25 bg-light">
-   <div class="w-100 p-1" v-for="container of containerArray" :key="container.name">
-     {{container.name}}
-   </div>
- </div>
+  <div class="d-flex flex-column align-content-center w-25 bg-light">
+    <div class="w-100 p-1"
+         v-for="(container, index) of containerArray"
+         :key="container.date"
+         :class="{active: container.date === $store.state.activeContainer}"
+    >
+      Контейнер: {{ index }}
+    </div>
+  </div>
 </template>
 
 <script>

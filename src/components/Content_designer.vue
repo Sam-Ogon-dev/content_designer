@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-row w-100 bg-primary h-100">
     <ContainerList :containerArray="containerArray"/>
-    <WorkArea :containerArray="containerArray" :changeContainer="changeContainer"/>
+    <WorkArea :containerArray="containerArray"/>
   </div>
 </template>
 
@@ -16,11 +16,7 @@ import WorkArea from "./Work_area";
       WorkArea
     },
     props: {
-      containerArray: Array,
-      changeContainer: Function
-    },
-    updated() {
-      console.log("ren")
+      containerArray: Array
     }
   }
 </script>

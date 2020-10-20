@@ -3,8 +3,7 @@
     <Container v-for="(container, index) of containerArray"
                :container="container"
                :index="index"
-               :key="container.name"
-               :changeContainer="changeContainer"
+               :key="container.date"
     />
   </div>
 </template>
@@ -15,8 +14,7 @@ import Container from "./Container";
 export default {
   name: "WorkArea",
   props: {
-    containerArray: Array,
-    changeContainer: Function
+    containerArray: Array
   },
   components: {
     Container
