@@ -75,12 +75,12 @@ export const store = new Vuex.Store({
                     const newContainerArray = [...state.history.containerArray];
                     newContainerArray[state.history.preset.id] = state.history.preset.state;
                     state.history.containerArray = newContainerArray;
+                //    неправильно отрабатывает в некоторых случаях
                 }
 
                 const newLast = [...state.history.last];
                 newLast.splice(newLast.length - 1, 1);
                 state.history.last = newLast;
-
             } else {
                 const newContainerArray = [...state.history.containerArray];
                 newContainerArray.splice(newContainerArray.length - 1, 1);
@@ -88,7 +88,6 @@ export const store = new Vuex.Store({
                 state.history.last = [];
                 state.history.containerArray = newContainerArray;
             }
-
         },
         NEXT_HISTORY: state => {
             if (!state.history.future.length) {

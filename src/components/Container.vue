@@ -81,25 +81,19 @@ export default {
 
       e.target.parentNode.style.width = (this.width) + "px";
       e.target.parentNode.style.height = (this.height) + "px";
-      // console.log(e.offsetX)
-      // console.log(e.clientX)
+
       if(e.clientX > 0) {
-        const offset = (e.clientX - e.target.parentNode.offsetLeft) - this.width;
-        console.dir(offset)
-        // this.width += e.offsetX / 100;
-        this.width += offset;
+        this.width += (e.clientX - e.target.parentNode.offsetLeft) - this.width;
+        this.height += (e.clientY - e.target.parentNode.offsetTop) - this.height;
       }
-      // this.height += e.offsetY / 5;
     },
-    saveResize(e) {
+    saveResize() {
       const newState = {
         x: this.container.x,
         y: this.container.y,
         date: this.container.date,
-        // width: e.target.parentNode.clientWidth,
-        // height: e.target.parentNode.clientHeight
-        width: window.getComputedStyle(e.target.parentNode).width,
-        height: window.getComputedStyle(e.target.parentNode).height
+        width: this.width,
+        height: this.height
       }
       this.$store.commit('CHANGE_HISTORY', {
         type: "change",
@@ -123,9 +117,6 @@ export default {
         height: this.container.height + "px"
       }
     }
-  },
-  updated() {
-    console.log("===================")
   }
 }
 </script>
