@@ -31,11 +31,13 @@ export default {
       this.$store.commit("CHANGE_HISTORY", {
         type: "created",
         payload: {
-          x: 110,
-          y: 110,
+          x: document.documentElement.clientWidth / 2,
+          y: document.documentElement.clientHeight / 2,
           date: Date.now(),
           width: 200,
-          height: 200
+          height: 200,
+          contentType: "",
+          content: ""
         }
       });
     },

@@ -2,6 +2,7 @@
   <div class="d-flex flex-column align-content-center w-25 bg-light">
     <div class="w-100 p-1"
          v-for="(container, index) of containerArray"
+         @click="$store.commit('SET_ACTIVE_CONTAINER', container.date)"
          :key="container.date"
          :class="{active: container.date === $store.state.activeContainer}"
     >

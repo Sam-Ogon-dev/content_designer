@@ -17,7 +17,7 @@ export const store = new Vuex.Store({
     getters: {},
     mutations: {
         CHANGE_HISTORY: (state, {type, payload}) => {
-            if(state.history.future.length) {
+            if (state.history.future.length) {
                 state.history.future = [];
             }
             if (type === "created") {
@@ -40,15 +40,12 @@ export const store = new Vuex.Store({
                 }
             }
             if (type === "change") {
-                state.history.last.push({
-                    id: state.history.preset.id,
-                    type: state.history.preset.type,
-                    state: state.history.preset.state
-                });
+                state.history.last.push(state.history.preset);
                 state.history.preset = {
                     id: payload.id,
                     type: "change",
-                    state: payload.newState
+                    state: payload.newState,
+                    oldState: state.history.containerArray[payload.id]
                 }
                 const changedArray = [...state.history.containerArray];
                 changedArray[payload.id] = payload.newState;
@@ -56,7 +53,7 @@ export const store = new Vuex.Store({
             }
         },
         BACK_HISTORY: state => {
-            if(state.history.preset) {
+            if (state.history.preset) {
                 state.history.future.unshift(state.history.preset);
             }
 
@@ -71,11 +68,29 @@ export const store = new Vuex.Store({
 
 
                 if (state.history.preset.type === "change") {
-                    state.history.preset = state.history.last[state.history.last.length - 1];
-                    const newContainerArray = [...state.history.containerArray];
-                    newContainerArray[state.history.preset.id] = state.history.preset.state;
+                    let newContainerArray = [...state.history.containerArray];
+
+                    if (state.history.preset.oldState) {
+                        newContainerArray = newContainerArray.map(item => {
+                            if (item.date === state.history.preset.state.date) {
+                                return state.history.preset.oldState;
+                            } else {
+                                return item;
+                            }
+                        });
+                        state.history.preset = state.history.last[state.history.last.length - 1];
+                    } else {
+                        state.history.preset = state.history.last[state.history.last.length - 1];
+                        newContainerArray = newContainerArray.map(item => {
+                            if (item.date === state.history.preset.state.date) {
+                                return state.history.preset.state;
+                            } else {
+                                return item;
+                            }
+                        });
+                    }
+
                     state.history.containerArray = newContainerArray;
-                //    неправильно отрабатывает в некоторых случаях
                 }
 
                 const newLast = [...state.history.last];
@@ -96,12 +111,12 @@ export const store = new Vuex.Store({
             state.history.last.push(state.history.preset);
             state.history.preset = state.history.future[0];
 
-            if(state.history.preset.type === "change") {
+            if (state.history.preset.type === "change") {
                 const newContainerArray = [...state.history.containerArray];
                 newContainerArray[state.history.future[0].id] = state.history.future[0].state;
                 state.history.containerArray = newContainerArray;
             }
-            if(state.history.preset.type === "created") {
+            if (state.history.preset.type === "created") {
                 const newContainerArray = [...state.history.containerArray];
                 newContainerArray.push(state.history.future[0].state);
                 state.history.containerArray = newContainerArray;

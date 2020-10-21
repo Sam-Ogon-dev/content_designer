@@ -1,29 +1,41 @@
 <template>
-  <div class="position-absolute bg-warning content_container d-flex justify-content-between flex-row-reverse"
+  <div class="position-absolute bg-warning content_container d-flex justify-content-between"
        :class="{active: container.date === $store.state.activeContainer}"
        draggable="true"
        :style="style"
        @dragstart="dragStart"
        @dragend="drop"
-       @mousedown="elemToCenter"
-  >
+       @mousedown="elemToCenter">
+
+    <ModalWindow v-if="openModalWindow" :readFile="readFile"/>
+
+    <div class="content_area w-100 h-100 bg-dark" @dblclick="openModal">
+      <img :src="contentData.content" class="w-100 h-100" draggable="false" v-if="contentData.contentType === 'image'"/>
+      <pre class="text-light" v-if="contentData.contentType === 'text'" draggable="false">{{contentData.content}}</pre>
+      <video :src="contentData.content"
+             class="h-100 w-100"
+             autoplay="autoplay" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'
+             v-if="contentData.contentType === 'video'"></video>
+    </div>
+
     <div style="width: 20px; height: 20px; background: black; align-self: flex-end"
          @drag="resize"
          draggable="true"
          @dragend="saveResize"
-         class="size_controller"
-    >
-
+         class="size_controller">
     </div>
   </div>
 </template>
 
 <script>
+import ModalWindow from "./Modal_window";
+
 export default {
   data() {
     return {
       width: this.container.width,
-      height: this.container.height
+      height: this.container.height,
+      openModalWindow: false
     }
   },
   name: "Container",
@@ -49,7 +61,9 @@ export default {
         y: e.pageY - e.target.offsetHeight / 2,
         date: this.container.date,
         width: this.container.width,
-        height: this.container.height
+        height: this.container.height,
+        contentType: this.container.contentType,
+        content: this.container.content
       }
       this.$store.commit('CHANGE_HISTORY', {
         type: "change",
@@ -60,29 +74,18 @@ export default {
       });
     },
     elemToCenter(e) {
-      if (!e.composedPath()[0].classList.contains("content_container")) {
+      if (e.composedPath()[0].classList.contains("size_controller")) {
         return
       }
-
       this.$store.commit('SET_ACTIVE_CONTAINER', this.container.date);
       e.target.style.left = e.pageX - e.target.offsetWidth / 2 + 'px';
       e.target.style.top = e.pageY - e.target.offsetHeight / 2 + 'px';
     },
     resize(e) {
-
-      // console.log(e.target.parentNode.style.width + " el")
-      // console.log(this.width + " data")
-      // console.log(this.container.width + "con")
-      // console.log(e.target.parentNode.style.width + " width")
-      // console.log(e.target.parentNode.clientWidth + " clientWidth")
-      //ClientWidth меньше чем ширина в стилях!!
-      //узнать больше о getComputedStyle
-      //лучше расчитывать ширину блока через clientWidth
-
       e.target.parentNode.style.width = (this.width) + "px";
       e.target.parentNode.style.height = (this.height) + "px";
 
-      if(e.clientX > 0) {
+      if(e.clientX > 0 && e.clientY > 0) {
         this.width += (e.clientX - e.target.parentNode.offsetLeft) - this.width;
         this.height += (e.clientY - e.target.parentNode.offsetTop) - this.height;
       }
@@ -93,7 +96,9 @@ export default {
         y: this.container.y,
         date: this.container.date,
         width: this.width,
-        height: this.height
+        height: this.height,
+        contentType: this.container.contentType,
+        content: this.container.content
       }
       this.$store.commit('CHANGE_HISTORY', {
         type: "change",
@@ -102,6 +107,42 @@ export default {
           newState
         }
       });
+    },
+    openModal() {
+      this.openModalWindow = true;
+    },
+    readFile(e, contentType) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        this.openModalWindow = false;
+
+        const newState = {
+          x: this.container.x,
+          y: this.container.y,
+          date: this.container.date,
+          width: this.container.width,
+          height: this.container.height,
+          content: reader.result,
+          contentType
+        }
+        this.$store.commit("CHANGE_HISTORY", {
+          type: "change",
+          payload: {
+            id: this.index,
+            newState
+          }
+        });
+      }
+
+      if(contentType === "image") {
+        reader.readAsDataURL(e.target.files[0]);
+      }
+      if(contentType === "text") {
+        reader.readAsText(e.target.files[0]);
+      }
+      if(contentType === "video") {
+        reader.readAsDataURL(e.target.files[0]);
+      }
     }
   },
   props: {
@@ -116,7 +157,16 @@ export default {
         width: this.container.width + "px",
         height: this.container.height + "px"
       }
+    },
+    contentData: function () {
+      return {
+        contentType: this.container.contentType,
+        content: this.container.content
+      }
     }
+  },
+  components: {
+    ModalWindow
   }
 }
 </script>
