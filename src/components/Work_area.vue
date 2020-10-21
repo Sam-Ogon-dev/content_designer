@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100 w-75 bg-secondary">
+  <div class="h-100 w-75 bg-secondary work_area">
     <Container v-for="(container, index) of containerArray"
                :container="container"
                :index="index"

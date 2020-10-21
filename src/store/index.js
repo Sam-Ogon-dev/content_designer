@@ -50,6 +50,7 @@ export const store = new Vuex.Store({
                 const changedArray = [...state.history.containerArray];
                 changedArray[payload.id] = payload.newState;
                 state.history.containerArray = changedArray;
+                // console.log(state.history.preset)
             }
         },
         BACK_HISTORY: state => {
