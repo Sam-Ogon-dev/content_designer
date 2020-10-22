@@ -76,6 +76,7 @@ export const store = new Vuex.Store({
             }
         },
         BACK_HISTORY: state => {
+            console.log()
             if (state.history.preset) {
                 state.history.future.unshift(state.history.preset);
             }
