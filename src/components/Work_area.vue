@@ -1,6 +1,6 @@
 <template>
   <div class="h-100 w-75 bg-secondary work_area">
-    <Container v-for="(container, index) of containerArray"
+    <Container v-for="(container, index) of filteredArray"
                :openModal="openModal"
                :container="container"
                :index="index"
@@ -65,6 +65,17 @@ export default {
     openModal(container) {
       this.currentContainer = container;
       this.openModalWindow = true;
+    }
+  },
+  computed: {
+    filteredArray: function () {
+      return this.containerArray.filter(item => {
+        if(item.deleted) {
+          return false;
+        } else {
+          return true;
+        }
+      });
     }
   }
 }

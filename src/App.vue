@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <div class="d-flex flex-row w-100 bg-danger align-content-center p-1">
-      <img class="back icon m-1" src="@/assets/arrow.png" @click="back">
-      <img class="next icon reverse_image m-1" src="@/assets/arrow.png" @click="next">
+      <img :class="{disable: !Object.keys($store.state.history.preset).length}" class="back icon m-1" src="@/assets/arrow.png" @click="back">
+      <img :class="{disable: !$store.state.history.future.length}" class="next icon reverse_image m-1" src="@/assets/arrow.png" @click="next">
       <img class="plus icon m-1" src="@/assets/plus.png" @click="createContainer">
-      <img class="delete icon m-1" src="@/assets/basket.png" @click="deleteContainer">
+      <img :class="{disable: !$store.state.activeContainer}" class="delete icon m-1" src="@/assets/basket.png" @click="deleteContainer">
     </div>
     <ContentDesigner :containerArray="containerArray"/>
   </div>
@@ -48,8 +48,17 @@ export default {
       this.$store.commit("NEXT_HISTORY");
     },
     deleteContainer() {
-
+      this.$store.commit("CHANGE_HISTORY", {
+        type: "deleted",
+        payload: this.$store.state.activeContainer
+      });
     }
   }
 }
 </script>
+
+<style>
+  .disable {
+    opacity: 0.3;
+  }
+</style>

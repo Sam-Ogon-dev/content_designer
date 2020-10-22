@@ -22,6 +22,7 @@
     </div>
 
     <div style="width: 20px; height: 20px; background: black; align-self: flex-end"
+         @dragstart="hideClone"
          @drag="resize"
          draggable="true"
          @dragend="saveResize"
@@ -146,6 +147,12 @@ export default {
         x: limitX || 0,
         y: limitY || 0
       }
+    },
+    hideClone(e) {
+      e.target.style.opacity = 0;
+      setTimeout(() => {
+        e.target.style.opacity = 1;
+      }, 0)
     }
   },
   props: {

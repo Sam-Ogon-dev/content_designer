@@ -2,7 +2,15 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 Vue.use(Vuex);
-//хранить во всех типах истории изменения в виде {id, event, state}
+
+function findId(array, date) {
+    for (let i = 0; i < array.length; i++) {
+        if(array[i].date === date) {
+            return i;
+        }
+    }
+}
+
 
 export const store = new Vuex.Store({
     state: {
@@ -51,6 +59,21 @@ export const store = new Vuex.Store({
                 changedArray[payload.id] = payload.newState;
                 state.history.containerArray = changedArray;
             }
+            if (type === "deleted") {
+                state.history.last.push(state.history.preset);
+                const changedArray = [...state.history.containerArray];
+                const id = findId(changedArray, payload)
+                changedArray[id] = {...changedArray[id]}
+                changedArray[id].deleted = true;
+
+                state.history.preset = {
+                    id: id,
+                    type: "deleted",
+                    state: changedArray[id],
+                    oldState: state.history.containerArray[id]
+                }
+                state.history.containerArray = changedArray;
+            }
         },
         BACK_HISTORY: state => {
             if (state.history.preset) {
@@ -61,6 +84,7 @@ export const store = new Vuex.Store({
 
                 if (state.history.preset.type === "created") {
                     const newContainerArray = [...state.history.containerArray];
+                    if(state.history.preset.state.date === state.activeContainer) { state.activeContainer = 0 }
                     newContainerArray.splice(state.history.preset.id, 1);
                     state.history.containerArray = newContainerArray;
                     state.history.preset = state.history.last[state.history.last.length - 1];
@@ -92,6 +116,12 @@ export const store = new Vuex.Store({
 
                     state.history.containerArray = newContainerArray;
                 }
+                if(state.history.preset.type === "deleted") {
+                    const newContainerArray = [...state.history.containerArray];
+                    newContainerArray[state.history.preset.id] = state.history.preset.oldState;
+                    state.history.containerArray = newContainerArray;
+                    state.history.preset = state.history.last[state.history.last.length - 1];
+                }
 
                 const newLast = [...state.history.last];
                 newLast.splice(newLast.length - 1, 1);
@@ -99,7 +129,8 @@ export const store = new Vuex.Store({
             } else {
                 const newContainerArray = [...state.history.containerArray];
                 newContainerArray.splice(newContainerArray.length - 1, 1);
-                state.history.preset = false
+                state.activeContainer = 0
+                state.history.preset = {}
                 state.history.last = [];
                 state.history.containerArray = newContainerArray;
             }
@@ -121,6 +152,12 @@ export const store = new Vuex.Store({
                 newContainerArray.push(state.history.future[0].state);
                 state.history.containerArray = newContainerArray;
             }
+            if(state.history.preset.type === "deleted") {
+                const newContainerArray = [...state.history.containerArray];
+                newContainerArray[state.history.preset.id] = state.history.preset.state;
+                state.history.containerArray = newContainerArray;
+            }
+
 
 
             const newFuture = [...state.history.future];
