@@ -7,12 +7,14 @@
        @dragend="drop"
        @mousedown="elemToCenter">
 
-    <ModalWindow v-if="openModalWindow" :readFile="readFile"/>
 
-    <div class="content_area w-100 h-100 bg-dark" @dblclick="openModal">
+
+    <div class="content_area w-100 h-100 bg-dark" @dblclick="openModal({index, state: container})">
       <img :src="contentData.content" class="w-100 h-100" draggable="false" v-if="contentData.contentType === 'image'"/>
+
       <pre class="text-light" v-if="contentData.contentType === 'text'"
            draggable="false">{{ contentData.content }}</pre>
+
       <video :src="contentData.content"
              class="h-100 w-100"
              autoplay="autoplay" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'
@@ -29,7 +31,7 @@
 </template>
 
 <script>
-import ModalWindow from "./Modal_window";
+
 
 export default {
   data() {
@@ -52,19 +54,20 @@ export default {
       }, 0);
     },
     drop(e) {
-      setTimeout(() => {
+      if (!e.composedPath()[0].classList.contains("content_container")) {
+        return
+      }
+      this.elemToCenter(e);
         e.target.style.opacity = 1;
-        e.target.style.left = e.pageX - e.target.offsetWidth / 2 + "px";
-        e.target.style.top = e.pageY - e.target.offsetHeight / 2 + "px";
 
 
         const {x, y} = this.limitArea(e);
-        e.target.style.left = (x || +e.target.style.left.replace("px", "")) + "px"
-        e.target.style.top = (y || +e.target.style.top.replace("px", "")) + "px"
+        e.target.style.left = (x || +e.target.style.left) + "px"
+        e.target.style.top = (y || +e.target.style.top) + "px"
         
         const newState = {
-          x: +e.target.style.left.replace("px", ""),
-          y: +e.target.style.top.replace("px", ""),
+          x: e.target.style.left.replace("px", ""),
+          y: e.target.style.top.replace("px", ""),
           date: this.container.date,
           width: this.container.width,
           height: this.container.height,
@@ -79,30 +82,6 @@ export default {
             newState
           }
         });
-      }, 0);
-
-      // setTimeout(() => {
-        // console.log(e)
-        // e.target.style.opacity = 1;
-        // const {x, y} = this.limitArea(e);
-        // const newState = {
-        //   x: x || e.pageX - e.target.offsetWidth / 2,
-        //   y: y || e.pageY - e.target.offsetHeight / 2,
-        //   date: this.container.date,
-        //   width: this.container.width,
-        //   height: this.container.height,
-        //   contentType: this.container.contentType,
-        //   content: this.container.content
-        // }
-        // // console.log(newState)
-        // this.$store.commit('CHANGE_HISTORY', {
-        //   type: "change",
-        //   payload: {
-        //     id: this.index,
-        //     newState
-        //   }
-        // });
-      // }, 1);
     },
     elemToCenter(e) {
       if (e.composedPath()[0].classList.contains("size_controller")) {
@@ -139,42 +118,6 @@ export default {
         }
       });
     },
-    openModal() {
-      this.openModalWindow = true;
-    },
-    readFile(e, contentType) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        this.openModalWindow = false;
-
-        const newState = {
-          x: this.container.x,
-          y: this.container.y,
-          date: this.container.date,
-          width: this.container.width,
-          height: this.container.height,
-          content: reader.result,
-          contentType
-        }
-        this.$store.commit("CHANGE_HISTORY", {
-          type: "change",
-          payload: {
-            id: this.index,
-            newState
-          }
-        });
-      }
-
-      if (contentType === "image") {
-        reader.readAsDataURL(e.target.files[0]);
-      }
-      if (contentType === "text") {
-        reader.readAsText(e.target.files[0]);
-      }
-      if (contentType === "video") {
-        reader.readAsDataURL(e.target.files[0]);
-      }
-    },
     limitArea(e) {
       const borders = {
         left: document.querySelector(".container_list").offsetWidth,
@@ -207,7 +150,8 @@ export default {
   },
   props: {
     index: Number,
-    container: Object
+    container: Object,
+    openModal: Function
   },
   computed: {
     style: function () {
@@ -224,9 +168,6 @@ export default {
         content: this.container.content
       }
     }
-  },
-  components: {
-    ModalWindow
   }
 }
 </script>
